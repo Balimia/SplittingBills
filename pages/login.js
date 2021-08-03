@@ -27,6 +27,7 @@ export default function Login() {
 	};
 
 	const handleEnter = (event) => {
+		console.log(URL);
 		if (event.keyCode === 13) {
 			const form = event.target.form;
 			const index = Array.prototype.indexOf.call(form, event.target);
