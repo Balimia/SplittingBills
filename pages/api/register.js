@@ -1,14 +1,15 @@
 import { hash } from 'bcrypt';
-import { appendFile } from 'fs';
+import connect from '../../utils/mongoose';
+import User from '../../utils/User';
 
 export default async function register(req, res) {
 	if (req.method === 'POST') {
-		hash(req.body.pwd, 8, function (err, hash) {
+		hash(req.body.pwd, 8, async function (err, hash) {
 			if (err) console.error(err);
-			const user = `${req.body.name},${hash}\n`;
-			appendFile('./users.csv', user, (err) => {
-				if (err) throw err;
-			});
+			const connection = await connect();
+			const user = new User({ name: req.body.name, hash });
+			await user.save();
+			connection.close();
 			return res.status(200).json({ message: 'Registered', user: req.body.name });
 		});
 	} else {

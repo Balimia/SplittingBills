@@ -2,7 +2,8 @@ import { useRouter } from 'next/router';
 import { useRef, useEffect, useState } from 'react';
 import styles from '../styles/index.module.css';
 
-const url = 'https://t4.gg'; // 'http://localhost:3000'
+// const url = 'https://t4.gg';
+const url = 'http://localhost:3000';
 
 export default function Login() {
 	const router = useRouter();
