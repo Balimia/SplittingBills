@@ -2,8 +2,7 @@ import { useRouter } from 'next/router';
 import { useRef, useEffect, useState } from 'react';
 import styles from '../styles/index.module.css';
 
-// const url = 'https://t4.gg';
-const url = 'http://localhost:3000';
+const URL = process.env.URL;
 
 export default function Login() {
 	const router = useRouter();
@@ -53,9 +52,9 @@ export default function Login() {
 	async function handleSubmit(e) {
 		e.preventDefault();
 		if (nameRef.current?.value === '' || pwdRef.current?.value === '') return;
-		const { message, redirect } = await checkAPI(`${url}/api/users`);
+		const { message, redirect } = await checkAPI(`${URL}/api/users`);
 		if (message) return alert('Wrong password!'); // TODO better
-		const json = await checkAPI(`${url}/api/${redirect}`);
+		const json = await checkAPI(`${URL}/api/${redirect}`);
 		if (json.user) localStorage.setItem('user', json.user);
 		if (json.message) router.push('/register');
 		else router.push('/login');
