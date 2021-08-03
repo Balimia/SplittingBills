@@ -2,8 +2,6 @@ import { useRouter } from 'next/router';
 import { useRef, useEffect, useState } from 'react';
 import styles from '../styles/index.module.css';
 
-const URL = process.env.URL;
-
 export default function Login() {
 	const router = useRouter();
 	const nameRef = useRef(null);
@@ -27,7 +25,6 @@ export default function Login() {
 	};
 
 	const handleEnter = (event) => {
-		console.log(URL);
 		if (event.keyCode === 13) {
 			const form = event.target.form;
 			const index = Array.prototype.indexOf.call(form, event.target);
@@ -53,9 +50,9 @@ export default function Login() {
 	async function handleSubmit(e) {
 		e.preventDefault();
 		if (nameRef.current?.value === '' || pwdRef.current?.value === '') return;
-		const { message, redirect } = await checkAPI(`${URL}/api/users`);
+		const { message, redirect } = await checkAPI(`/api/users`);
 		if (message) return alert('Wrong password!'); // TODO better
-		const json = await checkAPI(`${URL}/api/${redirect}`);
+		const json = await checkAPI(`/api/${redirect}`);
 		if (json.user) localStorage.setItem('user', json.user);
 		if (json.message) router.push('/register');
 		else router.push('/login');
