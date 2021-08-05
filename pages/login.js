@@ -1,12 +1,19 @@
-import { useRouter } from 'next/router';
 import { useRef, useEffect, useState } from 'react';
-import styles from '../styles/index.module.css';
+import { useRouter } from 'next/router';
+import { useUser } from '../components/user';
+import styles from '../styles/login.module.css';
 
 export default function Login() {
+	const { user, setUser } = useUser();
 	const router = useRouter();
 	const nameRef = useRef(null);
 	const pwdRef = useRef(null);
 	const [showField, setShowField] = useState(false);
+
+	useEffect(() => {
+		if (user) return router.push('/');
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [user]);
 
 	useEffect(() => {
 		if (nameRef.current) {
@@ -40,22 +47,24 @@ export default function Login() {
 				'Content-Type': 'application/json',
 			},
 			body: JSON.stringify({
-				name: nameRef.current?.value.toLowerCase(),
+				name: capitalize(nameRef.current?.value),
 				pwd: pwdRef.current?.value,
 			}),
 		});
 		return await res.json();
 	};
 
-	async function handleSubmit(e) {
-		e.preventDefault();
+	async function handleSubmit() {
 		if (nameRef.current?.value === '' || pwdRef.current?.value === '') return;
 		const { message, redirect } = await checkAPI(`/api/users`);
 		if (message) return alert('Wrong password!'); // TODO better
 		const json = await checkAPI(`/api/${redirect}`);
-		if (json.user) localStorage.setItem('user', json.user);
-		if (json.message) router.push('/register');
-		else router.push('/login');
+		if (json.user) {
+			localStorage.setItem('user', json.user);
+			setUser(json.user);
+		}
+		if (json.message) return router.push('/');
+		else return router.push('/login');
 	}
 
 	return (
@@ -84,10 +93,7 @@ export default function Login() {
 	);
 }
 
-export async function getStaticProps() {
-	return {
-		props: {
-			login: true,
-		},
-	};
-}
+const capitalize = (str) => {
+	str = str.toLowerCase();
+	return str.charAt(0).toUpperCase() + str.slice(1);
+};

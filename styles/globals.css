@@ -28,3 +28,7 @@ h1 {
 	font-size: 3.3em;
 	color: rgb(80, 80, 80);
 }
+
+h3 {
+	font-weight: normal;
+}
