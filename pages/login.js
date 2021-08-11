@@ -2,6 +2,8 @@ import { useRef, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useUser } from '../components/user';
 import styles from '../styles/login.module.css';
+import checkAPI from '../utils/apiCall';
+import helpers from '../utils/helpers';
 
 export default function Login() {
 	const { user, setUser } = useUser();
@@ -31,34 +33,24 @@ export default function Login() {
 		if (event.target.name === 'name') event.target.value !== '' ? setShowField(true) : setShowField(false);
 	};
 
-	const handleEnter = (event) => {
-		if (event.keyCode === 13) {
-			const form = event.target.form;
-			const index = Array.prototype.indexOf.call(form, event.target);
-			index === 0 ? form.elements[index + 1]?.focus() : handleSubmit(event);
-			event.preventDefault();
+	const handleEnter = (e) => {
+		if (e.keyCode === 13) {
+			const form = e.target.form;
+			const index = Array.prototype.indexOf.call(form, e.target);
+			index === 0 ? form.elements[index + 1]?.focus() : handleSubmit(e);
+			e.preventDefault();
 		}
-	};
-
-	const checkAPI = async (url) => {
-		const res = await fetch(url, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({
-				name: capitalize(nameRef.current?.value),
-				pwd: pwdRef.current?.value,
-			}),
-		});
-		return await res.json();
 	};
 
 	async function handleSubmit() {
 		if (nameRef.current?.value === '' || pwdRef.current?.value === '') return;
-		const { message, redirect } = await checkAPI(`/api/users`);
+		const body = JSON.stringify({
+			name: helpers.capitalize(nameRef.current?.value),
+			pwd: pwdRef.current?.value,
+		});
+		const { message, redirect } = await checkAPI('/api/users', body);
 		if (message) return alert('Wrong password!'); // TODO better
-		const json = await checkAPI(`/api/${redirect}`);
+		const json = await checkAPI(`/api/${redirect}`, body);
 		if (json.user) {
 			localStorage.setItem('user', json.user);
 			setUser(json.user);
@@ -92,8 +84,3 @@ export default function Login() {
 		</div>
 	);
 }
-
-const capitalize = (str) => {
-	str = str.toLowerCase();
-	return str.charAt(0).toUpperCase() + str.slice(1);
-};

@@ -2,14 +2,12 @@
 	display: flex;
 	margin: 50px;
 	overflow-x: auto;
-	/* background-color: antiquewhite; */
 	min-height: 300px;
 }
 
 .form {
 	min-width: 40%;
 	width: 300px;
-	/* background-color: aquamarine; */
 	padding-bottom: 8px;
 }
 
@@ -59,4 +57,11 @@
 
 .pointer {
 	cursor: pointer;
+}
+
+.unselectable {
+	-webkit-user-select: none; /* Safari */
+	-moz-user-select: none; /* Firefox */
+	-ms-user-select: none; /* IE10+/Edge */
+	user-select: none; /* Standard */
 }

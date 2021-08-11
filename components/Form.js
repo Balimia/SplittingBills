@@ -1,8 +1,9 @@
 import useSWR from 'swr';
 import Loading from './Loading';
-import { useUser } from './user';
 import styles from '../styles/form.module.css';
+import { useUser } from './user';
 import { fetcher } from '../utils/helpers';
+import checkAPI from '../utils/apiCall';
 import { useRef, useState } from 'react';
 
 export default function Form() {
@@ -13,76 +14,124 @@ export default function Form() {
 }
 
 const Table = ({ arr }) => {
-	const date = new Date().toISOString().substr(0, 10);
-	const { user } = useUser();
-	const [value, setValue] = useState(user);
-
 	const sorted = arr.sort((a, b) => a.name.localeCompare(b.name));
+	const { user } = useUser();
+	const reason = useRef();
+	const price = useRef();
+	const date = useRef();
+	const [dropdown, setDropdown] = useState(user);
+	const [selectedUsers, setSelectedUsers] = useState([]);
+	const [users] = useState(
+		sorted.map((user) => {
+			return { name: user.name };
+		})
+	);
 
-	const list = sorted.map((user) => (
-		<option key={user._id} value={user.name}>
-			{user.name}
-		</option>
-	));
+	const resetForm = () => {
+		reason.current.value = '';
+		price.current.value = '';
+		date.current.value = new Date().toISOString().substr(0, 10);
+		setDropdown(user);
+		setSelectedUsers([]);
+	};
 
-	const checboxList = sorted.map((user) => (
-		<div className={styles.formEntry} key={user._id}>
-			<label className={styles.pointer}>
-				<input type="checkbox" name={user.name} />
-				<span className={styles.span}>{user.name}</span>
-			</label>
-		</div>
-	));
+	const handleSelectUser = (e) => {
+		if (!selectedUsers.includes(e.target.name)) {
+			setSelectedUsers([...selectedUsers, e.target.name]);
+		} else {
+			setSelectedUsers(
+				selectedUsers.filter((selectedUserId) => {
+					return selectedUserId !== e.target.name;
+				})
+			);
+		}
+	};
+	const handleSelectAllUsers = () => {
+		if (selectedUsers.length < users.length) {
+			setSelectedUsers(users.map(({ name }) => name));
+		} else {
+			setSelectedUsers([]);
+		}
+	};
+	const handleDDLChange = (e) => setDropdown(e.target.value);
+	const handleSubmit = async (e) => {
+		e.preventDefault();
+		const body = JSON.stringify({
+			date: date.current.value,
+			reason: reason.current.value,
+			amount: Number(price.current.value),
+			payer: dropdown,
+			participants: selectedUsers,
+		});
+		const { error, message } = await checkAPI('/api/expense', body);
+		if (error) return alert('An error has occured, sorry!');
+		if (message) return resetForm();
+	};
 
-	const handleDDL = (e) => setValue(e.target.value);
-	const handleCheckbox = () => {};
+	const DropdownList = () =>
+		sorted.map((user) => (
+			<option key={user._id} value={user.name}>
+				{user.name}
+			</option>
+		));
+
+	const CheckboxList = () =>
+		sorted.map((user) => (
+			<div className={styles.formEntry} key={user._id}>
+				<label className={styles.pointer}>
+					<input type="checkbox" name={user.name} checked={selectedUsers.includes(user.name)} onChange={handleSelectUser} />
+					<span className={`${styles.span} ${styles.unselectable}`}>{user.name}</span>
+				</label>
+			</div>
+		));
 
 	return (
 		<div className={styles.container}>
-			<form className={styles.form}>
-				{/* REASON */}
+			<form className={styles.form} onSubmit={handleSubmit}>
 				<div className={styles.formEntry}>
 					<input
 						className={`${styles.textInput} ${styles.large}`}
 						type="text"
-						name="reason"
+						ref={reason}
 						placeholder="What did you buy?"
 						autoFocus
 						autoComplete="false"
+						required
 					/>
 					<input
 						className={`${styles.textInput} ${styles.large}`}
-						type="text"
-						name="price"
+						type="number"
+						ref={price}
 						placeholder="How much did it cost?"
 						autoComplete="false"
+						required
 					/>
 				</div>
-				{/* BUYER */}
 				<div className={styles.formEntry}>
 					<label>
-						<select className={`${styles.textInput} ${styles.ddl} ${styles.smoll} ${styles.pointer}`} value={value} onChange={handleDDL}>
-							{list}
+						<select className={`${styles.textInput} ${styles.ddl} ${styles.smoll} ${styles.pointer}`} value={dropdown} onChange={handleDDLChange}>
+							<DropdownList />
 						</select>
-						<span className={styles.span}>paid the bill, on </span>
+						<span className={`${styles.span} ${styles.unselectable}`}>paid the bill, on </span>
 					</label>
 					<label>
-						<input className={`${styles.textInput} ${styles.medium} ${styles.pointer}`} type="date" name="date" defaultValue={date} />
+						<input
+							className={`${styles.textInput} ${styles.medium} ${styles.pointer}`}
+							type="date"
+							ref={date}
+							defaultValue={new Date().toISOString().substr(0, 10)}
+						/>
 					</label>
 				</div>
-
-				{/* RECIPIENTS SELECT ALL */}
 				<div className={styles.formEntry}>
 					<label className={styles.pointer}>
-						<input type="checkbox" onClick={handleCheckbox} />
-						<span className={styles.span}>Toggle everyone</span>
+						<input type="checkbox" checked={selectedUsers.length === users.length} onChange={handleSelectAllUsers} />
+						<span className={`${styles.span} ${styles.unselectable}`}>Toggle everyone</span>
 					</label>
 				</div>
-				{/* RECIPIENTS LIST */}
-				{checboxList}
-				{/* SUBMIT TODOOOO */}
+				<CheckboxList />
 				<div className={`${styles.formEntry} ${styles.button}`}>
-					<input className={`${styles.textInput} ${styles.smol} ${styles.submit} ${styles.pointer}`} type="submit" value="submit" />
+					<input className={`${styles.textInput} ${styles.smol} ${styles.submit} ${styles.pointer}`} type="submit" value="Submit" />
 				</div>
 			</form>
 		</div>
