@@ -1,7 +1,7 @@
 import styles from '../styles/form.module.css';
 import { useUser } from '../context/user';
 import checkAPI from '../utils/apiCall';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useBalance } from '../context/balances';
 
 export default function Form({ users }) {
@@ -12,11 +12,15 @@ export default function Form({ users }) {
 	const date = useRef();
 	const [dropdown, setDropdown] = useState(user);
 	const [selectedUsers, setSelectedUsers] = useState([]);
-	const [allUsers] = useState(
-		users.map((user) => {
-			return { name: user.name };
-		})
-	);
+	const [allUsers, setAllUsers] = useState([]);
+
+	useEffect(() => {
+		setAllUsers(
+			users.map((user) => {
+				return { name: user.name };
+			})
+		);
+	}, [users]);
 
 	const resetForm = () => {
 		reason.current.value = '';
