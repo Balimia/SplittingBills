@@ -1,5 +1,5 @@
 import '../styles/globals.css';
-import { UserContext } from '../components/user';
+import { UserContext } from '../context/user';
 import { useState, useEffect } from 'react';
 import Router from 'next/router';
 import Loading from '../components/Loading.js';

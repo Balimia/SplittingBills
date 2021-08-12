@@ -1,28 +1,19 @@
-import useSWR from 'swr';
-import Loading from './Loading';
 import styles from '../styles/form.module.css';
-import { useUser } from './user';
-import { fetcher } from '../utils/helpers';
+import { useUser } from '../context/user';
 import checkAPI from '../utils/apiCall';
 import { useRef, useState } from 'react';
+import { useRouter } from 'next/router';
 
-export default function Form() {
-	const { data, error } = useSWR('/api/data', fetcher);
-	if (error) return <div>Failed to Load...</div>;
-	if (!data) return <Loading />;
-	return <Table arr={data.users} />;
-}
-
-const Table = ({ arr }) => {
-	const sorted = arr.sort((a, b) => a.name.localeCompare(b.name));
+export default function Form({ users }) {
+	const router = useRouter();
 	const { user } = useUser();
 	const reason = useRef();
 	const price = useRef();
 	const date = useRef();
 	const [dropdown, setDropdown] = useState(user);
 	const [selectedUsers, setSelectedUsers] = useState([]);
-	const [users] = useState(
-		sorted.map((user) => {
+	const [allUsers] = useState(
+		users.map((user) => {
 			return { name: user.name };
 		})
 	);
@@ -33,6 +24,7 @@ const Table = ({ arr }) => {
 		date.current.value = new Date().toISOString().substr(0, 10);
 		setDropdown(user);
 		setSelectedUsers([]);
+		router.reload(window.location.pathname); // POOP
 	};
 
 	const handleSelectUser = (e) => {
@@ -47,8 +39,8 @@ const Table = ({ arr }) => {
 		}
 	};
 	const handleSelectAllUsers = () => {
-		if (selectedUsers.length < users.length) {
-			setSelectedUsers(users.map(({ name }) => name));
+		if (selectedUsers.length < allUsers.length) {
+			setSelectedUsers(allUsers.map(({ name }) => name));
 		} else {
 			setSelectedUsers([]);
 		}
@@ -69,14 +61,14 @@ const Table = ({ arr }) => {
 	};
 
 	const DropdownList = () =>
-		sorted.map((user) => (
+		users.map((user) => (
 			<option key={user._id} value={user.name}>
 				{user.name}
 			</option>
 		));
 
 	const CheckboxList = () =>
-		sorted.map((user) => (
+		users.map((user) => (
 			<div className={styles.formEntry} key={user._id}>
 				<label className={styles.pointer}>
 					<input type="checkbox" name={user.name} checked={selectedUsers.includes(user.name)} onChange={handleSelectUser} />
@@ -125,7 +117,7 @@ const Table = ({ arr }) => {
 				</div>
 				<div className={styles.formEntry}>
 					<label className={styles.pointer}>
-						<input type="checkbox" checked={selectedUsers.length === users.length} onChange={handleSelectAllUsers} />
+						<input type="checkbox" checked={selectedUsers.length === allUsers.length} onChange={handleSelectAllUsers} />
 						<span className={`${styles.span} ${styles.unselectable}`}>Toggle everyone</span>
 					</label>
 				</div>
@@ -136,4 +128,4 @@ const Table = ({ arr }) => {
 			</form>
 		</div>
 	);
-};
+}

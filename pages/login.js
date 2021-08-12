@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { useUser } from '../components/user';
+import { useUser } from '../context/user';
 import styles from '../styles/login.module.css';
 import checkAPI from '../utils/apiCall';
 import helpers from '../utils/helpers';

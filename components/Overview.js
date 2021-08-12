@@ -1,24 +1,24 @@
-import useSWR from 'swr';
-import Loading from './Loading';
 import styles from '../styles/overview.module.css';
-import { fetcher } from '../utils/helpers';
+import { useState } from 'react';
 
-export default function Overview() {
-	const { data, error } = useSWR('/api/data', fetcher);
-	if (error) return <div>Failed to Load...</div>;
-	if (!data) return <Loading />;
-	return <Table arr={data.users} />;
-}
+export default function Overview({ users }) {
+	const [balance] = useState(
+		users.reduce((obj, user) => {
+			return {
+				...obj,
+				[user.name]: user.expenses + user.balance,
+			};
+		}, {})
+	);
 
-const Table = ({ arr }) => {
-	const names = arr.map((user) => (
+	const names = users.map((user) => (
 		<th className={`${styles.thead} ${styles.row}`} key={user._id}>
 			{user.name}
 		</th>
 	));
-	const values = arr.map((user) => (
+	const values = users.map((user) => (
 		<td className={styles.row} key={user._id}>
-			{user.balance}
+			{balance[user.name]}
 		</td>
 	));
 	return (
@@ -33,4 +33,4 @@ const Table = ({ arr }) => {
 			</table>
 		</div>
 	);
-};
+}

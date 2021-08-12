@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import styles from '../styles/index.module.css';
-import { useUser } from './user';
+import { useUser } from '../context/user';
 
 export default function Nav() {
 	const { user, setUser } = useUser();
@@ -21,7 +21,7 @@ export default function Nav() {
 			</div>
 			<div className={styles.box}>
 				<h3>
-					<Link href="/">
+					<Link href="/history">
 						<a>History</a>
 					</Link>
 				</h3>
