@@ -1,15 +1,8 @@
 import styles from '../styles/overview.module.css';
-import { useState } from 'react';
+import { useBalance } from '../context/balances';
 
 export default function Overview({ users }) {
-	const [balance] = useState(
-		users.reduce((obj, user) => {
-			return {
-				...obj,
-				[user.name]: user.expenses + user.balance,
-			};
-		}, {})
-	);
+	const { balances } = useBalance();
 
 	const names = users.map((user) => (
 		<th className={`${styles.thead} ${styles.row}`} key={user._id}>
@@ -18,7 +11,7 @@ export default function Overview({ users }) {
 	));
 	const values = users.map((user) => (
 		<td className={styles.row} key={user._id}>
-			{balance[user.name]}
+			{`${balances[user.name]}€`}
 		</td>
 	));
 	return (

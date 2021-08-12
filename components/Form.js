@@ -2,10 +2,10 @@ import styles from '../styles/form.module.css';
 import { useUser } from '../context/user';
 import checkAPI from '../utils/apiCall';
 import { useRef, useState } from 'react';
-import { useRouter } from 'next/router';
+import { useBalance } from '../context/balances';
 
 export default function Form({ users }) {
-	const router = useRouter();
+	const { balances, setBalances } = useBalance();
 	const { user } = useUser();
 	const reason = useRef();
 	const price = useRef();
@@ -24,7 +24,6 @@ export default function Form({ users }) {
 		date.current.value = new Date().toISOString().substr(0, 10);
 		setDropdown(user);
 		setSelectedUsers([]);
-		router.reload(window.location.pathname); // POOP
 	};
 
 	const handleSelectUser = (e) => {
@@ -57,7 +56,9 @@ export default function Form({ users }) {
 		});
 		const { error, message } = await checkAPI('/api/expense', body);
 		if (error) return alert('An error has occured, sorry!');
-		if (message) return resetForm();
+		if (message) resetForm();
+		const { result } = await checkAPI('/api/balance', JSON.stringify({}));
+		if (result) return setBalances({ ...balances, ...result });
 	};
 
 	const DropdownList = () =>
@@ -95,6 +96,7 @@ export default function Form({ users }) {
 						type="number"
 						ref={price}
 						placeholder="How much did it cost?"
+						step=".01"
 						autoComplete="false"
 						required
 					/>

@@ -24,6 +24,6 @@ export default async function expense(req, res) {
 
 const splitCheck = async (amount, payer, participants) => {
 	const split = amount / participants.length;
-	await User.findOneAndUpdate({ name: payer }, { $inc: { expenses: amount } });
-	await User.updateMany({ name: { $in: participants } }, { $inc: { balance: -split } });
+	await User.findOneAndUpdate({ name: payer }, { $inc: { expenses: amount.toFixed(2) } });
+	await User.updateMany({ name: { $in: participants } }, { $inc: { balance: -split.toFixed(2) } });
 };

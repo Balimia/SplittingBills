@@ -6,21 +6,30 @@ import Overview from '../components/Overview';
 import Form from '../components/Form';
 import Loading from '../components/Loading';
 import styles from '../styles/index.module.css';
+import { BalanceContext } from '../context/balances';
+import { useEffect, useState } from 'react';
 
 export default function Home() {
 	const { user } = useUser();
 	const { data, error } = useSWR('/api/data', fetcher);
+	const [balances, setBalances] = useState({});
+	const value = { balances, setBalances };
+
+	useEffect(() => {
+		if (data) return setBalances(data.balances);
+	}, [data]);
 
 	if (!user || error) return <div>Failed to Load...</div>;
 	if (!data) return <Loading />;
-	const sortedUsers = data.users.sort((a, b) => a.name.localeCompare(b.name));
 
 	return (
-		<div className={styles.container}>
-			<Nav />
-			<Overview users={sortedUsers} />
-			<h2>Add an expense</h2>
-			<Form users={sortedUsers} />
-		</div>
+		<BalanceContext.Provider value={value}>
+			<div className={styles.container}>
+				<Nav />
+				<Overview users={data.sortedUsers} />
+				<h2>Add an expense</h2>
+				<Form users={data.sortedUsers} />
+			</div>
+		</BalanceContext.Provider>
 	);
 }
