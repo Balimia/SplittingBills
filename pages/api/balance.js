@@ -10,14 +10,15 @@ export default async function balances(req, res) {
 }
 
 const calculateBalances = (transactions) => {
-	const participants = {};
-	transactions.forEach((e) => {
-		let split = e.amount / e.participants.length;
-		participants[e.payer] ? (participants[e.payer] += e.amount) : (participants[e.payer] = e.amount);
-		e.participants.forEach((i) => (participants[i] ? (participants[i] -= split) : (participants[i] = -split)));
+	const balances = {};
+	transactions.forEach((transaction) => {
+		balances[transaction.payer] ? (balances[transaction.payer] += transaction.amount) : (balances[transaction.payer] = transaction.amount);
+		transaction.participants.forEach((participant) =>
+			balances[participant.name] ? (balances[participant.name] -= participant.split) : (balances[participant.name] = -participant.split)
+		);
 	});
-	for (const p in participants) {
-		participants[p] = Math.round((participants[p] + Number.EPSILON) * 100) / 100;
+	for (const person in balances) {
+		balances[person] = Math.round((balances[person] + Number.EPSILON) * 100) / 100;
 	}
-	return participants;
+	return balances;
 };
