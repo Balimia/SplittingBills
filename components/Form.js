@@ -10,6 +10,8 @@ export default function Form({ users }) {
 	const reason = useRef();
 	const price = useRef();
 	const date = useRef();
+	const customUsers = useRef({});
+	const [customForm, setCustomForm] = useState(false);
 	const [dropdown, setDropdown] = useState(user);
 	const [selectedUsers, setSelectedUsers] = useState([]);
 	const [allUsers, setAllUsers] = useState([]);
@@ -49,14 +51,33 @@ export default function Form({ users }) {
 		}
 	};
 	const handleDDLChange = (e) => setDropdown(e.target.value);
+	const handleFormChange = (e) => setCustomForm(!customForm);
+	const handleCustomUsers = (e) => (customUsers.current = { ...customUsers.current, [e.target.name]: Number(e.target.value).toFixed(2) });
 	const handleSubmit = async (e) => {
 		e.preventDefault();
+		let participants = {};
+		if (customForm) {
+			let sum = 0;
+			for (const person in customUsers.current) {
+				sum += Number(customUsers.current[person]);
+			}
+			if (sum !== Number(price.current.value)) return alert("Please make sure that the sum of each person's share matches the total amount paid.");
+			participants = customUsers.current;
+		} else {
+			if (!selectedUsers.length) return alert('Please select more than 0 participants.');
+			participants = selectedUsers.reduce((prev, person) => {
+				return {
+					...prev,
+					[person]: Number(price.current.value / selectedUsers.length).toFixed(2),
+				};
+			}, {});
+		}
 		const body = JSON.stringify({
 			date: date.current.value,
 			reason: reason.current.value,
 			amount: Number(price.current.value),
 			payer: dropdown,
-			participants: selectedUsers,
+			participants,
 		});
 		const { error, message } = await checkAPI('/api/expense', body);
 		if (error) return alert('An error has occured, sorry!');
@@ -81,6 +102,61 @@ export default function Form({ users }) {
 				</label>
 			</div>
 		));
+
+	const CustomInputList = () =>
+		users.map((user) => (
+			<div className={styles.formEntry} key={user._id}>
+				<label className={`${styles.pointer} ${styles.miniContainer}`}>
+					<span className={`${styles.span} ${styles.unselectable}`}>{user.name}</span>
+					<input
+						className={`${styles.textInput} ${styles.large}`}
+						name={user.name}
+						type="number"
+						placeholder="0.00€"
+						autoComplete="false"
+						step=".01"
+						onChange={handleCustomUsers}
+					/>
+				</label>
+			</div>
+		));
+
+	const Equal = () => {
+		return (
+			<>
+				<div className={styles.formEntry}>
+					<span className={`${styles.span} ${styles.unselectable}`}>
+						<i>
+							Split the bill equally among the participants.<br></br>Do not forget to include the payer with the participants.
+						</i>
+					</span>
+				</div>
+				<div className={styles.formEntry}>
+					<label className={styles.pointer}>
+						<input type="checkbox" checked={selectedUsers.length === allUsers.length} onChange={handleSelectAllUsers} />
+						<span className={`${styles.span} ${styles.unselectable}`}>Toggle everyone</span>
+					</label>
+				</div>
+				<CheckboxList />
+			</>
+		);
+	};
+
+	const Custom = () => {
+		return (
+			<>
+				<div className={styles.formEntry}>
+					<span className={`${styles.span} ${styles.unselectable}`}>
+						<i>
+							Split the bill by entering a custom amount for each person who participated.<br></br>You may leave empty fields to skip non
+							participants.
+						</i>
+					</span>
+				</div>
+				<CustomInputList />
+			</>
+		);
+	};
 
 	return (
 		<div className={styles.container}>
@@ -122,12 +198,12 @@ export default function Form({ users }) {
 					</label>
 				</div>
 				<div className={styles.formEntry}>
-					<label className={styles.pointer}>
-						<input type="checkbox" checked={selectedUsers.length === allUsers.length} onChange={handleSelectAllUsers} />
-						<span className={`${styles.span} ${styles.unselectable}`}>Toggle everyone</span>
-					</label>
+					<select className={`${styles.textInput} ${styles.ddl} ${styles.large} ${styles.pointer}`} value={customForm} onChange={handleFormChange}>
+						<option value={false}>Equal Repartition</option>
+						<option value={true}>Custom Repartition</option>
+					</select>
 				</div>
-				<CheckboxList />
+				{customForm ? <Custom /> : <Equal />}
 				<div className={`${styles.formEntry} ${styles.button}`}>
 					<input className={`${styles.textInput} ${styles.smol} ${styles.submit} ${styles.pointer}`} type="submit" value="Submit" />
 				</div>

@@ -1,14 +1,15 @@
 .container {
 	display: flex;
-	margin: 50px;
-	overflow-x: auto;
-	min-height: 300px;
+	flex-direction: column;
+	margin: 20px;
+	overflow: auto;
+	height: 100vh;
+	align-items: center;
 }
 
 .form {
-	min-width: 40%;
-	width: 300px;
 	padding-bottom: 8px;
+	width: 600px;
 }
 
 .formEntry {
@@ -64,4 +65,11 @@
 	-moz-user-select: none; /* Firefox */
 	-ms-user-select: none; /* IE10+/Edge */
 	user-select: none; /* Standard */
+}
+
+.miniContainer {
+	display: flex;
+	align-items: baseline;
+	width: 50%;
+	justify-content: space-between;
 }

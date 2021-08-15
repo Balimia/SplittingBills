@@ -6,12 +6,7 @@ const expenseSchema = Schema(
 		reason: { type: String, required: true },
 		amount: { type: Number, required: true },
 		payer: { type: String, required: true },
-		participants: [
-			{
-				name: String,
-				split: Number,
-			},
-		],
+		participants: { type: Object, required: true },
 	},
 	{
 		collection: 'expenses',

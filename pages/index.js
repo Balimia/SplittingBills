@@ -27,7 +27,6 @@ export default function Home() {
 			<div className={styles.container}>
 				<Nav />
 				<Overview users={data.sortedUsers} />
-				<h2>Add an expense</h2>
 				<Form users={data.sortedUsers} />
 			</div>
 		</BalanceContext.Provider>

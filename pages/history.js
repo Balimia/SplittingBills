@@ -14,8 +14,12 @@ export default function Home() {
 		const { data } = props;
 
 		return data.map((transaction) => {
-			const namesOfParticipants = transaction.participants.map((person) => <li key={person._id}>{person.name}</li>);
-			const splitOfParticipants = transaction.participants.map((person) => <li key={person._id}>{`${person.split}€`}</li>);
+			let namesOfParticipants = [];
+			let splitOfParticipants = [];
+			for (const participant in transaction.participants) {
+				namesOfParticipants.push(<li key={participant}>{participant}</li>);
+				splitOfParticipants.push(<li key={participant}>{`${transaction.participants[participant]}€`}</li>);
+			}
 			return (
 				<tr key={transaction._id}>
 					<td className={styles.td}>{transaction.date.substr(0, 10)}</td>
