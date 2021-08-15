@@ -4,9 +4,8 @@ import User from '../../utils/User';
 
 export default async function users(req, res) {
 	if (req.method === 'POST') {
-		const connection = await connect();
+		await connect();
 		const user = await User.findOne({ name: req.body.name }).exec();
-		connection.close();
 
 		if (user) {
 			const match = await compare(req.body.pwd, user.hash);

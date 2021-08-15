@@ -12,8 +12,9 @@ export default function Home() {
 
 	const PopulateTable = ({ props }) => {
 		const { data } = props;
+		const reversed = [...data].reverse();
 
-		return data.map((transaction) => {
+		return reversed.map((transaction) => {
 			let namesOfParticipants = [];
 			let splitOfParticipants = [];
 			for (const participant in transaction.participants) {

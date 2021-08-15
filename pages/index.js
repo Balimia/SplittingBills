@@ -16,7 +16,7 @@ export default function Home() {
 	const value = { balances, setBalances };
 
 	useEffect(() => {
-		if (data) return setBalances(data.balances);
+		if (data) return setBalances(data.result);
 	}, [data]);
 
 	if (!user || error) return <div>Failed to Load...</div>;

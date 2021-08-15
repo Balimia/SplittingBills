@@ -7,10 +7,9 @@
 
 .tableContainer {
 	display: flex;
-	align-items: center;
 	justify-content: center;
 	margin: 50px;
-	overflow-x: auto;
+	overflow: auto;
 }
 
 .table {

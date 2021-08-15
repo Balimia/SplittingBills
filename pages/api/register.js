@@ -7,10 +7,9 @@ export default async function register(req, res) {
 		return new Promise((resolve, reject) => {
 			hash(req.body.pwd, 8)
 				.then(async (hash) => {
-					const connection = await connect();
+					await connect();
 					const user = new User({ name: req.body.name, hash });
 					await user.save();
-					connection.close();
 					return resolve(res.status(200).json({ message: 'Registered', user: req.body.name }));
 				})
 				.catch((error) => {

@@ -30,6 +30,7 @@ export default function Form({ users }) {
 		date.current.value = new Date().toISOString().substr(0, 10);
 		setDropdown(user);
 		setSelectedUsers([]);
+		customUsers.current = {};
 	};
 
 	const handleSelectUser = (e) => {
@@ -75,15 +76,15 @@ export default function Form({ users }) {
 		const body = JSON.stringify({
 			date: date.current.value,
 			reason: reason.current.value,
-			amount: Number(price.current.value),
+			amount: Number(price.current.value).toFixed(2),
 			payer: dropdown,
 			participants,
 		});
 		const { error, message } = await checkAPI('/api/expense', body);
 		if (error) return alert('An error has occured, sorry!');
 		if (message) resetForm();
-		const { result } = await checkAPI('/api/balance', JSON.stringify({}));
-		if (result) return setBalances({ ...balances, ...result });
+		const { data } = await checkAPI('/api/data', JSON.stringify({}));
+		if (data) return setBalances({ ...balances, ...data.result });
 	};
 
 	const DropdownList = () =>
