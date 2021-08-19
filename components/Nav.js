@@ -15,7 +15,7 @@ export default function Nav() {
 			<div className={styles.box}>
 				<h3>
 					<Link href="/">
-						<a>Overview</a>
+						<a>Add Expense</a>
 					</Link>
 				</h3>
 			</div>

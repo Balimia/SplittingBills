@@ -55,8 +55,7 @@ export default function Login() {
 			localStorage.setItem('user', json.user);
 			setUser(json.user);
 		}
-		if (json.message) return router.push('/');
-		else return router.push('/login');
+		if (!json.message) return router.push('/login');
 	}
 
 	return (
