@@ -83,8 +83,8 @@ export default function Form({ users }) {
 		const { error, message } = await checkAPI('/api/expense', body);
 		if (error) return alert('An error has occured, sorry!');
 		if (message) resetForm();
-		const { data } = await checkAPI('/api/data', JSON.stringify({}));
-		if (data) return setBalances({ ...balances, ...data.result });
+		const { result } = await checkAPI('/api/data', JSON.stringify({}));
+		if (result) return setBalances({ ...balances, ...result });
 	};
 
 	const DropdownList = () =>
