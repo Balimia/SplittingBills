@@ -1,6 +1,6 @@
 # Splitting Bills
 
-#### **Video Demo:** https://youtu.be/rpv2Bc9hLs0
+#### **Video Demo:** https://youtu.be/XqsjcfiIXf0
 
 #### **Description:** This app was built using Next.js, React and Mongodb. Its purpose it to let you divide up the cost of things like group dinners and trips so that everyone can pay their fair share.
 
